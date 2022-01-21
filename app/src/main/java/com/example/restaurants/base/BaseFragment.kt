@@ -26,12 +26,4 @@ abstract class BaseFragment : Fragment {
     }
 
     fun getRootActivity(): MainActivity = activity as MainActivity
-
-    // method to check
-    // if location is enabled
-    open fun isLocationEnabled(): Boolean {
-        val locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-    }
 }
