@@ -20,6 +20,17 @@ class LocationUtils private constructor(
     }
 
     @SuppressLint("MissingPermission")
+    fun getFusedLocation(locationCallback: ((Location) -> Unit)) {
+        fusedLocationProviderClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null)
+                    locationCallback.invoke(location)
+                else
+                    initOnLocationChangeListener(locationCallback)
+            }
+    }
+
+    @SuppressLint("MissingPermission")
     fun initOnLocationChangeListener(fusedLocation: ((Location) -> Unit)?) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {

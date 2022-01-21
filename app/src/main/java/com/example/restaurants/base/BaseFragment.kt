@@ -1,7 +1,5 @@
 package com.example.restaurants.base
 
-import android.content.Context
-import android.location.LocationManager
 import android.os.Bundle
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
@@ -22,7 +20,7 @@ abstract class BaseFragment : Fragment {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        progressDialog = DialogUtils.showProgressDialog(requireContext(), cancelable = false)
+        progressDialog = DialogUtils.showProgressDialog(getRootActivity(), cancelable = false)
     }
 
     fun getRootActivity(): MainActivity = activity as MainActivity

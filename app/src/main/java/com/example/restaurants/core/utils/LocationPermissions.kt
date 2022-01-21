@@ -9,7 +9,7 @@ import com.example.restaurants.App
 
 object LocationPermissions {
 
-    private const val REQUEST_CODE_LOCATION = 123
+    const val REQUEST_CODE_LOCATION = 123
 
     fun requestLocationPermissions(
         activity: Activity,
@@ -34,5 +34,14 @@ object LocationPermissions {
                 REQUEST_CODE_LOCATION
             )
         }
+    }
+
+    fun isLocationPermissionsGiven(activity: Activity, hasPermissions: (Boolean) -> Unit) {
+        hasPermissions(
+            ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
     }
 }

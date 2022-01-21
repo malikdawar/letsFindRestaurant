@@ -12,7 +12,6 @@ import javax.inject.Inject
 class FetchRestaurantsUseCase @Inject constructor(
     private val repository: PlacesRepository
 ) {
-
     suspend operator fun invoke(
         location: LatLng,
         bounds: LatLngBounds

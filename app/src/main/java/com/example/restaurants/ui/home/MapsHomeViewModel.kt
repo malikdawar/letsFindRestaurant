@@ -1,5 +1,6 @@
 package com.example.restaurants.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -38,6 +39,7 @@ class MapsHomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchRestaurantsUseCase.invoke(location, bounds).collect { dataState ->
+                Log.d("TattiCode", "dataStateVM")
                 when (dataState) {
                     is DataState.Success -> {
                         _uiState.postValue(ContentState)
