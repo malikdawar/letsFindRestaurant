@@ -32,16 +32,6 @@ fun View.gone() {
 }
 
 /**
- * An Extension to close keyboard.
- * @author Dawar Malik.
- */
-fun View.closeKeyboard() {
-    val inputMethodManager =
-        this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(this.windowToken, 0)
-}
-
-/**
  * Returns [Boolean] based on current time.
  * Returns true if hours are between 06:00 pm - 07:00 am
  */
