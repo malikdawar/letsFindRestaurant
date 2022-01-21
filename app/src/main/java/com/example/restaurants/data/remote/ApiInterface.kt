@@ -1,7 +1,6 @@
 package com.example.restaurants.data.remote
 
 import com.example.restaurants.core.utils.Const.PLACE_CATEGORY
-import com.example.restaurants.data.model.PhotosResponse
 import com.example.restaurants.data.model.SquarePlacesModel
 import retrofit2.http.GET
 import retrofit2.http.Query

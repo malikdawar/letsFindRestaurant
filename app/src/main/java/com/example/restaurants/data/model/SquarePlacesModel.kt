@@ -1,10 +1,8 @@
 package com.example.restaurants.data.model
 
-
 import com.google.gson.annotations.SerializedName
 
 data class SquarePlacesModel(
-    @SerializedName("results")
     val results: List<ResultsItem>?
 )
 
@@ -30,9 +28,9 @@ data class Geocodes(
 
 data class MainLocation(
     @SerializedName("latitude")
-    val latitude: Double?,
+    val latitude: Double,
     @SerializedName("longitude")
-    val longitude: Double?
+    val longitude: Double
 )
 
 data class Location(
