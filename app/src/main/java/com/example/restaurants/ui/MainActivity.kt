@@ -5,7 +5,7 @@ import androidx.activity.viewModels
 import com.example.restaurants.R
 import com.example.restaurants.base.BaseActivity
 import com.example.restaurants.core.extensions.replaceFragmentSafely
-import com.example.restaurants.ui.home.HomeFragment
+import com.example.restaurants.ui.home.MapsHomeFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -22,7 +22,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        replaceFragmentSafely(HomeFragment())
+        replaceFragmentSafely(MapsHomeFragment())
     }
-
 }

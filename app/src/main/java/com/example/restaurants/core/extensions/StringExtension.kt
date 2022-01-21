@@ -4,17 +4,11 @@ import com.example.restaurants.App
 import com.example.restaurants.R
 
 /**
- * The StringExtension.kt
- * @author Malik Dawar, malikdawar@hotmail.com
- */
-
-
-/**
  * Extension function to noNetworkErrorMessage
  * @author Dawar Malik.
  */
 fun noNetworkErrorMessage() =
-    App.getAppContext().getString(R.string.message_no_network_connected_str)
+    App.getAppContext().getString(R.string.message_network_error_str)
 
 /**
  * Extension function to somethingWentWrong
