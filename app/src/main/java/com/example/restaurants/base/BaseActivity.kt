@@ -2,7 +2,10 @@ package com.example.restaurants.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.restaurants.core.extensions.gone
+import com.example.restaurants.core.extensions.visible
 import com.example.restaurants.core.utils.InternetMonitor
+import com.example.restaurants.databinding.UiInternetMonitorBinding
 
 /**
  * The BaseActivity.kt

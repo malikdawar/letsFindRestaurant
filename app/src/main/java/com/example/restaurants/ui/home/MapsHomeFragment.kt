@@ -204,15 +204,6 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
         observerRestaurants()
     }
 
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        this.onRequestPermissionsResult(requestCode, grantResults)
-    }
-
     override fun onDrag() {
         if (viewModel.fragCreated)
             viewModel.fragCreated = false
@@ -220,7 +211,7 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
         val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
         viewModel.resetRestaurantsDataState()
         if (currentBounds != null && currentLatLng != null)
-            viewModel.getRestaurants(Dto(currentLatLng, currentBounds))
+            viewModel.getRestaurants(currentLatLng, currentBounds)
     }
 
     override fun onMarkerClick(p0: Marker): Boolean {
