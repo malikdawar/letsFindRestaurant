@@ -1,8 +1,6 @@
 package com.example.restaurants.core.extensions
 
-import android.content.Context
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.restaurants.App
 import java.util.*

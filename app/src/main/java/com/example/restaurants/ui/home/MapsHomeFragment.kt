@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.restaurants.R
 import com.example.restaurants.base.BaseFragment
@@ -15,6 +16,7 @@ import com.example.restaurants.core.utils.LocationUtils
 import com.example.restaurants.core.utils.MapsUtils
 import com.example.restaurants.data.model.Restaurant
 import com.example.restaurants.databinding.FragmentHomeBinding
+import com.example.restaurants.ui.MainViewModel
 import com.example.restaurants.ui.home.drag.IDragCallback
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,6 +34,7 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
     private var locationUtils: LocationUtils? = null
     private val mapsUtils = MapsUtils.getInstance()
     private val viewModel: MapsHomeViewModel by viewModels()
+    private val sharedViewModel: MainViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentHomeBinding::bind)
 
@@ -63,19 +66,9 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
                 }
             }
         }
+
         getCurrentLocation()
         initObservations()
-    }
-
-    override fun onDrag() {
-        if (viewModel.fragCreated)
-            viewModel.fragCreated = false
-        val currentLatLng = googleMap?.cameraPosition?.target
-        val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
-        viewModel.resetRestaurantsDataState()
-
-        if (currentBounds != null && currentLatLng != null)
-            viewModel.getRestaurants(currentLatLng, currentBounds)
     }
 
     private fun initObservations() {
@@ -100,6 +93,17 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
                 renderMarkers(it)
             }
         }
+    }
+
+    override fun onDrag() {
+        if (viewModel.fragCreated)
+            viewModel.fragCreated = false
+        val currentLatLng = googleMap?.cameraPosition?.target
+        val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
+        viewModel.resetRestaurantsDataState()
+
+        if (currentBounds != null && currentLatLng != null)
+            viewModel.getRestaurants(currentLatLng, currentBounds)
     }
 
     private fun renderMarkers(venues: List<Restaurant>) {
@@ -156,6 +160,11 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
     override fun onMarkerClick(p0: Marker): Boolean {
 
         return false
+    }
+
+    override fun onStop() {
+        super.onStop()
+        locationUtils?.removeLocationListener()
     }
 
     @SuppressLint("MissingPermission")

@@ -39,7 +39,6 @@ class MapsHomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchRestaurantsUseCase.invoke(location, bounds).collect { dataState ->
-                Log.d("TattiCode", "dataStateVM")
                 when (dataState) {
                     is DataState.Success -> {
                         _uiState.postValue(ContentState)
