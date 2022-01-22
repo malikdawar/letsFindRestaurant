@@ -2,6 +2,7 @@ package com.example.restaurants.ui.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -45,31 +46,12 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home_maps), OnMapReadyCa
     private val sharedViewModel: MainViewModel by activityViewModels()
     private val binding by viewBinding(FragmentHomeMapsBinding::bind)
 
-    @SuppressLint("MissingPermission")
-    private val permissionsResultCallback = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        when (it) {
-            true -> {
-                if (LocationPermissions.isLocationPermissionsGiven(getRootActivity())) {
-                    googleMap?.isMyLocationEnabled = true
-                    getCurrentLocation()
-                }
-            }
-            false -> {
-                Log.d(MapsHomeFragment::class.java.name, "Permission not given")
-            }
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         locationUtils = LocationUtils.getInstance(getRootActivity())
         LocationPermissions.requestLocationPermissions(requireActivity()) {
             Log.d(MapsHomeFragment::class.java.name, "Permission given $it")
-            if (it.not())
-                permissionsResultCallback.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
         viewModel.fragCreated = (savedInstanceState != null)
@@ -156,11 +138,6 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home_maps), OnMapReadyCa
         return false
     }
 
-    override fun onStop() {
-        super.onStop()
-        locationUtils?.removeLocationListener()
-    }
-
     private fun renderMarkers(venues: List<Restaurant>) {
         val markersToBeDisplayed = ArrayList<Restaurant>()
         val mainList = viewModel.markers.values
@@ -191,21 +168,17 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home_maps), OnMapReadyCa
         }
     }
 
-    /*@SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            LocationPermissions.REQUEST_CODE_LOCATION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED
-                ) {
-                    googleMap?.isMyLocationEnabled = true
-                    getCurrentLocation()
-                }
-            }
+    override fun onStop() {
+        super.onStop()
+        locationUtils?.removeLocationListener()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onResume() {
+        super.onResume()
+        if (LocationPermissions.isLocationPermissionsGiven(getRootActivity())) {
+            googleMap?.isMyLocationEnabled = true
+            getCurrentLocation()
         }
-    }*/
+    }
 }
