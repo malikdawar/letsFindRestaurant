@@ -42,7 +42,7 @@ class MapsHomeViewModel @Inject constructor(
         _uiState.postValue(LoadingState)
 
         viewModelScope.launch {
-            fetchRestaurantsUseCase.invoke(location, bounds).collect { dataState ->
+            fetchRestaurantsUseCase.invoke(location, bounds).collect { dataState->
                 when (dataState) {
                     is DataState.Success -> {
                         _uiState.postValue(ContentState)

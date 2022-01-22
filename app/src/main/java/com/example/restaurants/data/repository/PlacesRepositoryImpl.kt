@@ -40,13 +40,12 @@ class PlacesRepositoryImpl @Inject constructor(
                     if (bounds.contains(LatLng(it.latitude, it.longitude)))
                         boundedRestaurant.add(it)
                 }
-                //if (boundedRestaurant.isNotEmpty())
                 emit(DataState.success<List<Restaurant>>(boundedRestaurant))
 
                 onSuccessSuspend {
                     PlacesMapper.mapper(data)?.let {
                         InMemoryCache.add(it)
-                        //if (cache.isNullOrEmpty())
+
                         emit(DataState.success(it))
                     }
                 }

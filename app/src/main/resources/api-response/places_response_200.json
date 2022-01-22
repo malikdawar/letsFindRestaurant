@@ -1,0 +1,46 @@
+{
+  "results": [
+    {
+      "fsq_id": "4e6b30f8fa76cd0f77063d20",
+      "categories": [
+        {
+          "id": 13334,
+          "name": "Sandwich Restaurant",
+          "icon": {
+            "prefix": "https://ss3.4sqi.net/img/categories_v2/food/deli_",
+            "suffix": ".png"
+          }
+        }
+      ],
+      "distance": 1060,
+      "geocodes": {
+        "main": {
+          "latitude": 35.89466491621463,
+          "longitude": 14.469289183616638
+        }
+      },
+      "location": {
+        "address": "15, Triq Sant' Antnin",
+        "country": "MT",
+        "cross_street": "Triq Salvu Psaila",
+        "locality": "Birkirkara",
+        "postcode": "BKR4901",
+        "region": "Birkirkara"
+      },
+      "name": "Andrew's Snack Bar",
+      "related_places": {},
+      "timezone": "Europe/Malta"
+    }
+  ],
+  "context": {
+    "geo_bounds": {
+      "circle": {
+        "center": {
+          "latitude": 35.903152,
+          "longitude": 14.46389
+        },
+        "radius": 1000
+      }
+    }
+  }
+}
