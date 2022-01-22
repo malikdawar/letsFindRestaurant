@@ -14,11 +14,13 @@ import com.google.android.gms.maps.model.*
 class MapsUtils private constructor(private val context: Context) {
 
     fun drawMarker(
-        googleMap: GoogleMap,
+        googleMap: GoogleMap?,
         location: LatLng?,
         resDrawable: Int = R.drawable.pin,
         title: String? = null
     ): Marker? {
+        googleMap ?: return null
+
         val circleDrawable = ContextCompat.getDrawable(context, resDrawable)
         val markerIcon = getMarkerIconFromDrawable(circleDrawable)
         return googleMap.addMarker(

@@ -36,12 +36,10 @@ object LocationPermissions {
         }
     }
 
-    fun isLocationPermissionsGiven(activity: Activity, hasPermissions: (Boolean) -> Unit) {
-        hasPermissions(
-            ContextCompat.checkSelfPermission(
-                activity,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
+    fun isLocationPermissionsGiven(activity: Activity): Boolean {
+        return ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }
