@@ -44,9 +44,6 @@ class MapsHomeViewModelTest {
     @MockK
     lateinit var fetchRestaurantsUseCase: FetchRestaurantsUseCase
 
-    @MockK
-    lateinit var placesRepository: PlacesRepository
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -76,21 +73,4 @@ class MapsHomeViewModelTest {
             verify { uiObserver.onChanged(match { it == ContentState }) }
             verify { restaurantsListObserver.onChanged(match { it.size == givenRestaurants.size }) }
         }
-
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `given viewModel when the repository is called then the success date is same as expected`() {
-        val restaurantUIModel: Restaurant = mockk()
-        runBlocking {
-            placesRepository.loadPlaces(mockk(), mockk()).collectLatest {
-                launch {
-                    MatcherAssert.assertThat(
-                        it.data,
-                        CoreMatchers.`is`(restaurantUIModel)
-                    )
-                }
-            }
-        }
-    }
 }

@@ -39,11 +39,11 @@ class FetchRestaurantsUseCaseTest {
         val givenRestaurants = RestaurantsDataSource.getRestaurantsList()
 
         // When
-        coEvery { repository.loadPlaces(mockk(), any()) }
+        coEvery { repository.loadPlaces(any(), any()) }
             .returns(flowOf(DataState.success(givenRestaurants)))
 
         // Invoke
-        val restaurantsListFlow = sut(mockk<LatLng>(), mockk<LatLngBounds>())
+        val restaurantsListFlow = sut.invoke(mockk(), mockk())
 
         // Then
         MatcherAssert.assertThat(restaurantsListFlow, CoreMatchers.notNullValue())

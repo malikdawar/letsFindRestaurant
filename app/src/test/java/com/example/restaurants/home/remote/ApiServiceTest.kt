@@ -43,7 +43,7 @@ class ApiServiceTest : ApiAbstract<ApiInterface>() {
 
             // Then
             assertThat(responseBody?.get(0)?.fsqId, `is`("4e6b30f8fa76cd0f77063d20"))
-            assertThat(responseBody?.get(0)?.name, `is`("Sandwich Restaurant"))
+            assertThat(responseBody?.get(0)?.name, `is`("Andrew's Snack Bar"))
             assertThat(responseBody?.get(0)?.geocodes?.main?.latitude, `is`(35.89466491621463))
             assertThat(responseBody?.get(0)?.geocodes?.main?.longitude, `is`(14.469289183616638))
             assertThat(responseBody?.get(0)?.location?.locality, `is`("Birkirkara"))
