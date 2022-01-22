@@ -15,12 +15,9 @@ buildscript {
         hilt_version = '2.37'
         glide_version = '4.12.0'
         kprogresshud_version = '1.2.0'
-        PhotoView_version = '2.3.0'
         fragment_ktx = '1.4.0'
-        foursquare_version = '3.0.1'
         google_maps_version = '18.0.2'
         google_location_version = '19.0.1'
-        permission_dispatcher_version = '4.8.0'
     }
 
     repositories {
