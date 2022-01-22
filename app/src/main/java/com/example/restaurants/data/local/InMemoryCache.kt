@@ -2,7 +2,6 @@ package com.example.restaurants.data.local
 
 import com.example.restaurants.data.model.Restaurant
 
-
 object InMemoryCache {
     private val cache = ArrayList<Restaurant>()
 

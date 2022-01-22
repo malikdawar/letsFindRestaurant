@@ -31,23 +31,22 @@ class PlacesRepositoryImpl @Inject constructor(
     ): Flow<DataState<List<Restaurant>>> {
         return flow {
 
-            val locationStr = "${location.latitude} , ${location.longitude}"
+            val locationStr = "${location.latitude},${location.longitude}"
             apiService.loadPlaces(location = locationStr).apply {
 
                 val cache = InMemoryCache.get()
                 val boundedRestaurant = ArrayList<Restaurant>()
                 cache.forEach {
-                    val ln = LatLng(it.latitude, it.longitude)
-                    if (bounds.contains(ln))
+                    if (bounds.contains(LatLng(it.latitude, it.longitude)))
                         boundedRestaurant.add(it)
                 }
-                if (boundedRestaurant.isNotEmpty())
-                    emit(DataState.success<List<Restaurant>>(boundedRestaurant))
+                emit(DataState.success<List<Restaurant>>(boundedRestaurant))
 
                 onSuccessSuspend {
                     PlacesMapper.mapper(data)?.let {
                         InMemoryCache.add(it)
-                      //  emit(DataState.success(it))
+
+                        emit(DataState.success(it))
                     }
                 }
                 // handle the case when the API request gets an error response.

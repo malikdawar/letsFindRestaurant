@@ -7,6 +7,13 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import com.example.restaurants.ui.home.drag.IDragCallback
 
+/**
+ * The DraggableLayout.kt
+ * custom draggable layout widget, to moniter teh touch events
+ * @return Frame Layout
+ * @author Malik Dawar, malikdawar@hotmail.com
+ */
+
 class DraggableLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

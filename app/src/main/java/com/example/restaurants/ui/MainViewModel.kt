@@ -12,7 +12,6 @@ import javax.inject.Inject
  * @author Malik Dawar, malikdawar@hotmail.com
  */
 
-
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
