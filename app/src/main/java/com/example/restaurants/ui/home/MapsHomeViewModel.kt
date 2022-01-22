@@ -1,14 +1,15 @@
 package com.example.restaurants.ui.home
 
-import androidx.annotation.VisibleForTesting
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.restaurants.base.BaseViewModel
 import com.example.restaurants.data.DataState
-import com.example.restaurants.data.model.PhotoModel
 import com.example.restaurants.data.model.Restaurant
-import com.example.restaurants.data.usecases.FetchPhotosUseCase
+import com.example.restaurants.data.usecases.FetchRestaurantsUseCase
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapsHomeViewModel @Inject constructor(
-    private val fetchPhotosUseCase: FetchPhotosUseCase
+    private val fetchRestaurantsUseCase: FetchRestaurantsUseCase
 ) : BaseViewModel() {
 
     private var _uiState = MutableLiveData<HomeUiState>()
@@ -29,28 +30,15 @@ class MapsHomeViewModel @Inject constructor(
 
     val markers = HashMap<Marker, Restaurant>()
 
-    var fragCreated: Boolean = false
+    var fragCreated  : Boolean = false
 
-    /*fun getRestaurants(location: Dto) {
-
-
-        _restaurantsDataState.value = Loading
-
-        getRestaurants.execute(location)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { res -> _restaurantsDataState.value = res }
-            .also { compositeDisposable.add(it) }
-    }*/
-
-
-    fun getRestaurants(location: Dto) {
+    fun getRestaurants(location: LatLng, bounds: LatLngBounds) {
         if (_restaurantsDataState.value != null) return
 
         _uiState.postValue(LoadingState)
 
         viewModelScope.launch {
-            fetchPhotosUseCase.invoke(pageNum = page).collect { dataState ->
+            fetchRestaurantsUseCase.invoke(location, bounds).collect { dataState ->
                 when (dataState) {
                     is DataState.Success -> {
                         _uiState.postValue(ContentState)

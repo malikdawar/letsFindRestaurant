@@ -11,8 +11,8 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.airliftcodingassignmnet"
-        minSdkVersion 16
+        applicationId "com.example.restaurants"
+        minSdkVersion 19
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
@@ -58,16 +58,18 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$google_maps_version"
     implementation "com.google.android.gms:play-services-location:$google_location_version"
 
-    // Architecture
+    // lifecycle components
+    implementation 'androidx.lifecycle:lifecycle-common:2.4.0'
+
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    //implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -99,7 +101,4 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "com.github.chrisbanes:PhotoView:$PhotoView_version"
     implementation "com.kaopiz:kprogresshud:$kprogresshud_version"
-    implementation "com.foursquare:pilgrimsdk:$foursquare_version"
-    implementation "com.github.permissions-dispatcher:permissionsdispatcher:$permission_dispatcher_version"
-    implementation "com.github.permissions-dispatcher:permissionsdispatcher-processor:$permission_dispatcher_version"
 }

@@ -10,10 +10,11 @@ interface ApiInterface {
     @GET(PLACES_SERVICE_API)
     suspend fun loadPlaces(
         @Query("ll") location: String,
+        @Query("radius") radius: Int = 1000,
         @Query("categories") categories: String = PLACE_CATEGORY
     ): ApiResponse<SquarePlacesModel>
 
     companion object {
-        const val PLACES_SERVICE_API = "/places/search"
+        const val PLACES_SERVICE_API = "v3/places/search"
     }
 }

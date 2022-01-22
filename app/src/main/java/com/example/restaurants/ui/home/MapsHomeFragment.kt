@@ -1,71 +1,74 @@
 package com.example.restaurants.ui.home
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.Settings
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import com.example.restaurants.R
 import com.example.restaurants.base.BaseFragment
+import com.example.restaurants.core.extensions.showToastMsg
 import com.example.restaurants.core.extensions.viewBinding
+import com.example.restaurants.core.utils.LocationPermissions
+import com.example.restaurants.core.utils.LocationUtils
+import com.example.restaurants.core.utils.MapsUtils
+import com.example.restaurants.data.model.Restaurant
+import com.example.restaurants.databinding.FragmentHomeBinding
+import com.example.restaurants.ui.MainViewModel
 import com.example.restaurants.ui.home.drag.IDragCallback
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import permissions.dispatcher.*
-import com.example.restaurants.R
-import com.example.restaurants.core.extensions.showToastMsg
-import com.example.restaurants.data.DataState
-import com.example.restaurants.data.model.Restaurant
-import com.example.restaurants.databinding.FragmentHomeBinding
 
-@RuntimePermissions
 @AndroidEntryPoint
 class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener,
     IDragCallback {
 
     private var googleMap: GoogleMap? = null
+    private var locationUtils: LocationUtils? = null
+    private val mapsUtils = MapsUtils.getInstance()
     private val viewModel: MapsHomeViewModel by viewModels()
-    private val openSettingsActivity =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            getCurrentLocation()
-        }
-
-    private val openLocationSettingsScreen =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            getCurrentLocation()
-        }
+    private val sharedViewModel: MainViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentHomeBinding::bind)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding.root.setDrag(this)
-        viewModel.fragCreated = (savedInstanceState != null)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        LocationPermissions.requestLocationPermissions(requireActivity()) {
+            Log.d(MapsHomeFragment::class.java.name, "Permission given $it")
+        }
+        locationUtils = LocationUtils.getInstance(getRootActivity())
+        viewModel.fragCreated = (savedInstanceState != null)
+        binding.root.setDrag(this)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(p0: GoogleMap) {
+        googleMap = p0
+        googleMap?.setOnMarkerClickListener(this)
+        googleMap?.setMinZoomPreference(15f)
+        googleMap?.let {
+            LocationPermissions.isLocationPermissionsGiven(getRootActivity()) { permission ->
+                if (permission) {
+                    googleMap?.isMyLocationEnabled = true
+                    locationUtils?.getFusedLocation { loc ->
+                        mapsUtils.moveCameraOnMap(it, latLng = LatLng(loc.latitude, loc.longitude))
+                    }
+                }
+            }
+        }
+
+        getCurrentLocation()
+        initObservations()
     }
 
     private fun initObservations() {
@@ -78,7 +81,6 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
                 is ContentState -> {
                     progressDialog.dismiss()
                 }
-
                 is ErrorState -> {
                     progressDialog.dismiss()
                     showToastMsg(state.message)
@@ -86,32 +88,22 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
             }
         }
 
-        viewModel.restaurantsDataState.observe(viewLifecycleOwner) { photos ->
-
+        viewModel.restaurantsDataState.observe(viewLifecycleOwner) { restaurants ->
+            restaurants?.let {
+                renderMarkers(it)
+            }
         }
     }
 
-    private fun observerRestaurants() {
+    override fun onDrag() {
+        if (viewModel.fragCreated)
+            viewModel.fragCreated = false
+        val currentLatLng = googleMap?.cameraPosition?.target
+        val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
+        viewModel.resetRestaurantsDataState()
 
-        viewModel.restaurantsDataState.observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it) {
-                    is DataState.Success -> {
-                        getRootActivity().handleLoading(false)
-                        renderMarkers(it.data)
-                    }
-                    is DataState.Error -> {
-                        getRootActivity().handleLoading(false)
-                        if (it.error is Failure.NetworkConnection)
-                            getRootActivity().displayError(getString(R.string.no_internet_connection))
-                        else
-                            getRootActivity().displayError(getString(R.string.general_error))
-                    }
-                    is DataState.Loading -> getRootActivity().handleLoading(true)
-                }
-            }
-        )
+        if (currentBounds != null && currentLatLng != null)
+            viewModel.getRestaurants(currentLatLng, currentBounds)
     }
 
     private fun renderMarkers(venues: List<Restaurant>) {
@@ -121,106 +113,48 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
             if (!mainList.contains(it))
                 markersToBeDisplayed.add(it)
         }
-        if (viewModel.fragCreated && markersToBeDisplayed.isEmpty()) {
-            mainList.forEach {
-                val markerLoc = LatLng(it.latitude, it.longitude)
-                val marker = googleMap?.addMarker(MarkerOptions().position(markerLoc).title(it.name))
-                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(markerLoc))
-            }
-        } else {
-            markersToBeDisplayed.forEach {
-                val markerLoc = LatLng(it.latitude, it.longitude)
-                val marker = googleMap?.addMarker(MarkerOptions().position(markerLoc).title(it.name))
-                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(markerLoc))
-                if (marker != null)
-                    viewModel.markers[marker] = it
+
+        googleMap?.let {
+            if (viewModel.fragCreated && markersToBeDisplayed.isEmpty()) {
+                mainList.forEach { restaurant ->
+                    mapsUtils.drawMarker(
+                        it,
+                        location = LatLng(restaurant.latitude, restaurant.longitude),
+                        title = restaurant.name
+                    )
+                }
+            } else {
+                markersToBeDisplayed.forEach { restaurant ->
+                    val marker = mapsUtils.drawMarker(
+                        it,
+                        location = LatLng(restaurant.latitude, restaurant.longitude),
+                        title = restaurant.name
+                    )
+
+                    if (marker != null)
+                        viewModel.markers[marker] = restaurant
+                }
             }
         }
     }
 
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun getCurrentLocation() {
-        if (isLocationEnabled()) {
-            getUserLocation { location ->
-                Timber.e("available lat is %s , lon is %s", location.latitude, location.longitude)
+    private fun getCurrentLocation() {
+        if (locationUtils?.isLocationEnabled() == true) {
+            locationUtils?.initOnLocationChangeListener { location ->
                 val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
-                val latlng = LatLng(location.latitude, location.longitude)
-                currentBounds?.let { viewModel.getRestaurants(Dto(latlng, it)) }
 
+                currentBounds?.let {
+                    viewModel.getRestaurants(
+                        LatLng(
+                            location.latitude,
+                            location.longitude
+                        ), it
+                    )
+                }
             }
         } else {
-            MaterialAlertDialogBuilder(getRootActivity())
-                .setTitle(getString(R.string.enable_location))
-                .setMessage(R.string.location_disabled)
-                .setPositiveButton(getString(R.string.enable)) { dialog, _ ->
-                    openSettingsScreen()
-
-                    dialog.dismiss()
-                }
-                .setNegativeButton(getString(R.string.ignore)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+            showToastMsg(getString(R.string.message_enable_location))
         }
-    }
-
-    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun showRationaleForLocation(request: PermissionRequest) {
-        MaterialAlertDialogBuilder(getRootActivity())
-            .setMessage(R.string.permission_alert)
-            .setPositiveButton(getString(R.string.accept)) { dialog, _ ->
-                request.proceed()
-                dialog.dismiss()
-            }.setNegativeButton(getString(R.string.deny)) { dialog, _ ->
-                request.cancel()
-                dialog.dismiss()
-            }.show()
-    }
-
-    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun onLocationDenied() {
-        Toast.makeText(activity, getString(R.string.location_permission_denied), Toast.LENGTH_SHORT)
-            .show()
-    }
-
-    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun onLocationNeverAskAgain() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri: Uri = Uri.fromParts("package", activity?.packageName, null)
-        intent.data = uri
-        openSettingsActivity.launch(intent)
-    }
-
-    private fun openSettingsScreen() {
-        openLocationSettingsScreen.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(p0: GoogleMap) {
-        googleMap = p0
-        googleMap?.setOnMarkerClickListener(this)
-        googleMap?.setMinZoomPreference(15f)
-        googleMap?.isMyLocationEnabled = true
-        observerRestaurants()
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        this.onRequestPermissionsResult(requestCode, grantResults)
-    }
-
-    override fun onDrag() {
-        if (viewModel.fragCreated)
-            viewModel.fragCreated = false
-        val currentLatLng = googleMap?.cameraPosition?.target
-        val currentBounds = googleMap?.projection?.visibleRegion?.latLngBounds
-        viewModel.resetRestaurantsDataState()
-        if (currentBounds != null && currentLatLng != null)
-            viewModel.getRestaurants(Dto(currentLatLng, currentBounds))
     }
 
     override fun onMarkerClick(p0: Marker): Boolean {
@@ -228,4 +162,26 @@ class MapsHomeFragment : BaseFragment(R.layout.fragment_home), OnMapReadyCallbac
         return false
     }
 
+    override fun onStop() {
+        super.onStop()
+        locationUtils?.removeLocationListener()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LocationPermissions.REQUEST_CODE_LOCATION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    googleMap?.isMyLocationEnabled = true
+                    getCurrentLocation()
+                }
+            }
+        }
+    }
 }
