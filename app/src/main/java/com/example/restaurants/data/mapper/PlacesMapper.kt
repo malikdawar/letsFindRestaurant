@@ -14,6 +14,7 @@ object PlacesMapper {
                 longitude = it.geocodes?.main?.longitude ?: 0.0,
                 city = it.location?.locality,
                 address = it.location?.address,
+                postcode = it.location?.postcode
             )
         }
     } catch (e: Exception) {

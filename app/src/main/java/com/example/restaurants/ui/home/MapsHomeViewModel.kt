@@ -1,6 +1,5 @@
 package com.example.restaurants.ui.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -16,6 +15,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * The MapsHomeViewModel.kt
+ * @author Malik Dawar, malikdawar@hotmail.com
+ */
+
 @HiltViewModel
 class MapsHomeViewModel @Inject constructor(
     private val fetchRestaurantsUseCase: FetchRestaurantsUseCase
@@ -30,7 +34,7 @@ class MapsHomeViewModel @Inject constructor(
 
     val markers = HashMap<Marker, Restaurant>()
 
-    var fragCreated  : Boolean = false
+    var fragCreated: Boolean = false
 
     fun getRestaurants(location: LatLng, bounds: LatLngBounds) {
         if (_restaurantsDataState.value != null) return

@@ -11,5 +11,6 @@ data class Restaurant(
     val latitude: Double,
     val longitude: Double,
     val city: String?,
-    val address: String?
+    val address: String?,
+    val postcode: String?,
 ) : Parcelable
