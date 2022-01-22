@@ -92,4 +92,5 @@ dependencies {
 
     // Third-party
     implementation "com.kaopiz:kprogresshud:$kprogresshud_version"
+    implementation 'com.nabinbhandari.android:permissions:3.8'
 }
